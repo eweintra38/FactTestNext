@@ -33,7 +33,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model_name = args.model.split('/')[-1]
-    tokenizer = AutoTokenizer.from_pretrained(args.model,use_fast=True,unk_token="<unk>",bos_token="<s>",eos_token="</s>",add_bos_token=False,cache_dir=cache_dir)
+    tokenizer = AutoTokenizer.from_pretrained(args.model,use_fast=True,unk_token="<unk>",bos_token="<s>",eos_token="</s>",add_bos_token=False)
     model = AutoModelForCausalLM.from_pretrained(args.model,torch_dtype=torch.float16,device_map='auto')
 
     data = []
