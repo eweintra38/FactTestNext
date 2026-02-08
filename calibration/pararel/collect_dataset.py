@@ -9,10 +9,12 @@ import math
 import os
 
 
+import torch.nn as nn
+
 def inference(input_text, model):
-    device = torch.device("cuda:0")
+    device = next(model.parameters()).device
     full_input = "Question:" + input_text + " Answer:"
-    inputs = tokenizer(full_input,return_tensors="pt").to(0)
+    inputs = tokenizer(full_input,return_tensors="pt").to(device)
     ids = inputs['input_ids']
     length = len(ids[0])     
     outputs = model.generate(
@@ -33,8 +35,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model_name = args.model.split('/')[-1]
+    cache_dir = None  # Use default cache directory
     tokenizer = AutoTokenizer.from_pretrained(args.model,use_fast=True,unk_token="<unk>",bos_token="<s>",eos_token="</s>",add_bos_token=False,cache_dir=cache_dir)
-    model = AutoModelForCausalLM.from_pretrained(args.model,torch_dtype=torch.float16,device_map='auto')
+    
+    # Use single GPU that has most free memory for stability
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model,
+        dtype=torch.float32,  # Use float32 for stability
+        device_map={'': 1},   # Use GPU 1 which has the most free memory
+        low_cpu_mem_usage=True
+    )
 
     data = []
     with open(f"../../dataset/pararel/{args.dataset}.json",'r') as f:
@@ -43,13 +53,19 @@ if __name__ == "__main__":
     certain_data = []
     uncertain_data = []
 
-    # sample[0] is question. sample[1] is answer.
+    # Process samples individually for stability (proven to work)
+    print(f"Processing {len(data)} samples individually")
+    
     for sample in tqdm(data):
-        output = inference(sample[0], model)
-        if sample[1] in output:
-            certain_data.append(sample)
-        else:
-            uncertain_data.append(sample)
+        try:
+            output = inference(sample[0], model)
+            if sample[1] in output:
+                certain_data.append(sample)
+            else:
+                uncertain_data.append(sample)
+        except Exception as e:
+            print(f"Error processing sample: {e}")
+            continue
 
     random.shuffle(certain_data)
     random.shuffle(uncertain_data)

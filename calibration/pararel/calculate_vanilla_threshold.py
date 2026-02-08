@@ -13,10 +13,10 @@ import math
 import os
 
 def inference(input_text, model):
-    device = torch.device("cuda:0")
+    device = next(model.parameters()).device
     full_input = "Question:" + input_text + " Answer:"
     #full_input = input_text
-    inputs = tokenizer(full_input,return_tensors="pt").to(0)
+    inputs = tokenizer(full_input,return_tensors="pt").to(device)
     ids = inputs['input_ids']
     #ids = inputs.input_ids
     length = len(ids[0])
@@ -90,8 +90,18 @@ if __name__ == "__main__":
                 break
     
     else:
+        import torch.cuda
+        torch.cuda.empty_cache()  # Clear CUDA cache
+        
+        # Try float32 instead of float16 to avoid precision issues
         tokenizer = AutoTokenizer.from_pretrained(args.model,use_fast=True,unk_token="<unk>",bos_token="<s>",eos_token="</s>",add_bos_token=False)
-        model = AutoModelForCausalLM.from_pretrained(args.model,torch_dtype=torch.bfloat16,device_map='auto')
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            torch_dtype=torch.float32,  # Use float32 instead of float16
+            device_map={"": "cuda:1"},  # Force to GPU 1
+            low_cpu_mem_usage=True,
+            trust_remote_code=True
+        )
 
         certainties = []
         with open(f"../training_data/pararel_{model_name}_{args.dataset}.json",'r') as f:
