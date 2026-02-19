@@ -1,0 +1,1 @@
+k:4462 threshold:-2.70805020110221 alpha:0.1 delta:0.01
