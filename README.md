@@ -68,65 +68,87 @@ pip install -r requirements.txt
 
 ---
 
-## 🔧 Usage
+## 🔧 Usage — FEVER Pipeline (α = 0.05)
 
-### 🎯 Step 1: Calibration
+### 🎯 Step 1: Collect Calibration Dataset
 
-Navigate to the calibration directory:
+Navigate to the FEVER calibration directory:
 ```bash
-cd calibration/pararel
+cd calibration/FEVER
 ```
 
-#### 📊 Calibration Dataset Construction
+Run greedy inference on the training set to split into certain/uncertain:
 ```bash
-python collect_dataset.py --model openlm-research/open_llama_3b
+python collect_dataset.py \
+    --dataset fever_10k \
+    --model openlm-research/open_llama_3b \
+    --result FEVER
 ```
 
-#### 🎚️ Calibration and Threshold Selection
+This reads `dataset/FEVER/fever_10k.json` and saves:
+- `calibration/training_data/FEVER_open_llama_3b_certain.json`
+- `calibration/training_data/FEVER_open_llama_3b_uncertain.json`
 
-**For Vanilla Entropy Score Function:**
+### 🎚️ Step 2: Calibration and Threshold Selection
 
-Initial calibration run (computes and saves scores):
+#### 2a. Compute certainty scores (GPU-intensive):
 ```bash
 python calculate_vanilla_threshold.py \
+    --dataset uncertain \
     --model openlm-research/open_llama_3b \
+    --num_try 5
+```
+
+Saves scores to `calibration/training_data/FEVER_uncertain_5_open_llama_3b_certainties.json`.
+
+#### 2b. Compute threshold (CPU-only, fast — uses stored scores):
+```bash
+python calculate_vanilla_threshold.py \
+    --dataset uncertain \
+    --model openlm-research/open_llama_3b \
+    --num_try 5 \
     --alpha 0.05 \
-    --num_try 15
-```
-
-**Reusing Saved Scores:**
-
-After the initial run, you can quickly calculate thresholds for different alpha values using the stored scores:
-```bash
-python calculate_vanilla_threshold.py \
-    --model openlm-research/open_llama_3b \
-    --alpha 0.1 \
+    --delta 0.01 \
     --stored \
-    --num_try 15
+    --result FEVER
 ```
 
-The `--stored` flag allows you to experiment with different significance levels without re-running the expensive model evaluation.
+The threshold (τ) is appended to `calibration/training_data/FEVER.txt`.
 
-### 📈 Step 2: Evaluation
+> **💡 Tip**: The `--stored` flag allows you to quickly recompute thresholds for different α values without re-running the expensive model evaluation.
+
+### 📈 Step 3: Evaluation on Test Set
 
 ```bash
-cd evaluation/pararel
+cd evaluation/FEVER
 python evaluate_vanilla.py \
     --model openlm-research/open_llama_3b \
-    --num_try 15
+    --num_try 5
 ```
 
-#### 📊 Calculate Evaluation Metrics
-After evaluation, compute the metrics using:
+Reads `dataset/FEVER/fever_10k_test.json` and saves results to `evaluation/FEVER/results/ours_5_vanilla_open_llama_3b.json`.
+
+### 📊 Step 4: Calculate Evaluation Metrics
+
 ```bash
 python eval.py \
-    --model openlm-research/open_llama_3b \
-    --num_try 15 \
     --method vanilla \
-    --tau <your_threshold>
+    --num_try 5 \
+    --tau <your_threshold> \
+    --model openlm-research/open_llama_3b
 ```
 
-> **💡 Note**: Replace `<your_threshold>` with the threshold value obtained from the calibration step.
+> **💡 Note**: Replace `<your_threshold>` with the threshold value obtained from Step 2b.
+
+### 🔑 Key Differences: FEVER vs ParaRel
+
+| Aspect | ParaRel | FEVER |
+|--------|---------|-------|
+| **Format** | Free-form QA (`[question, answer]`) | Multiple-choice A/B/C (`{label, claim, evidence}`) |
+| **Inference** | 15 tokens generated, temp=1.0 | 1 token (A/B/C softmax), temp=0.7 |
+| **ID/OOD split** | Yes (`--domain ID/OOD`) | No — single test set |
+| **Prompt** | `"Question:{q} Answer:"` | `"Evidence:{e}\nClaim:{c}\nQuestion:...\nA:..B:..C:..\nAnswer:"` |
+| **Output file** | `ours_{domain}_{n}_vanilla_{model}.json` | `ours_{n}_vanilla_{model}.json` |
 
 ---
 
