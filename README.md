@@ -81,19 +81,19 @@
 
 **Configuration:** VE5 (Vanilla Entropy, `num_try=5`), α = 0.05, δ = 0.01, τ = -1.6094, Model: OpenLLaMA-3B
 
-| Metric | ID (ParaRel) | OOD (ParaRel-OOD) |
-|---|---|---|
-| **Total samples** | 5,584 | 11,180 |
-| **Total accuracy** | 20.00% | 14.90% |
-| **Certain samples** | 63 | 163 |
-| **Certain accuracy** | 26.98% | 20.86% |
-| **Certain 95% CI** | (15.87%, 38.10%) | (14.72%, 26.99%) |
-| **Uncertain samples** | 5,521 | 11,017 |
-| **Uncertain accuracy** | 19.92% | 14.81% |
-| **FNR (Type II)** | 0.0103 | 0.0136 |
-| **FPR (Type I)** | 0.9848 | 0.9796 |
+| Metric | Our ID | Paper ID (VE5) | Our OOD | Paper OOD |
+|---|---|---|---|---|
+| **Total samples** | 5,584 | — | 11,180 | — |
+| **Pretrained accuracy** | 20.00% | 36.66% | 14.90% | — (Fig. 4 only) |
+| **Certain samples** | 63 | — | 163 | — |
+| **Certain accuracy** | 26.98% | 60.54% | 20.86% | — (Fig. 4 only) |
+| **Certain 95% CI** | (15.87%, 38.10%) | — | (14.72%, 26.99%) | — |
+| **Uncertain samples** | 5,521 | — | 11,017 | — |
+| **Uncertain accuracy** | 19.92% | — | 14.81% | — |
+| **FNR (Type II)** | 0.0103 | — | 0.0136 | — |
+| **FPR (Type I)** | 0.9848 | 0.0455 | 0.9796 | — (Fig. 4 only) |
 
-> **Note**: The high FPR (~0.98) indicates the threshold is too restrictive with `num_try=5`, classifying only ~1% of samples as certain. The paper uses `num_try=15` and reports ~60–67% certain accuracy on ParaRel ID with OpenLLaMA-3B.
+
 
 ### FEVER — Vanilla Entropy (VE5)
 
