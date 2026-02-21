@@ -86,7 +86,7 @@
 | **Total samples** | 5,584 | — | 11,180 | — |
 | **Pretrained accuracy** | 20.00% | 36.66% | 14.90% | — (Fig. 4 only) |
 | **Certain samples** | 63 | — | 163 | — |
-| **Certain accuracy** | 26.98% | 60.54% | 20.86% | — (Fig. 4 only) |
+| **Certain accuracy** | **26.98%** | **60.54%** | 20.86% | — (Fig. 4 only) |
 | **Certain 95% CI** | (15.87%, 38.10%) | — | (14.72%, 26.99%) | — |
 | **Uncertain samples** | 5,521 | — | 11,017 | — |
 | **Uncertain accuracy** | 19.92% | — | 14.81% | — |
@@ -103,9 +103,9 @@
 |---|---|---|
 | **Total samples** | 9,999 | 10,000 |
 | **Total accuracy** | 32.47% | — |
-| **Pretrained AP** | 0.3825 | 0.3974 |
+| **Pretrained AP** | **0.3825** | **0.3974** |
 | **Certain samples** | 8,122 (81.2%) | — |
-| **Certain accuracy** | 32.79% | 60.24% |
+| **Certain accuracy** | **32.79%** | **60.24%** |
 | **Uncertain samples** | 1,877 | — |
 | **Uncertain accuracy** | 31.11% | — |
 | **FNR (Type II)** | 0.8085 | — |
