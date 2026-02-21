@@ -123,8 +123,11 @@ The threshold (τ) is appended to `calibration/training_data/FEVER.txt`.
 cd evaluation/FEVER
 python evaluate_vanilla.py \
     --model openlm-research/open_llama_3b \
-    --num_try 5
+    --num_try 5 \
+    --tau <your_threshold>
 ```
+
+> **💡 Note**: Replace `<your_threshold>` with the τ value from Step 2b. The default is `0.5` if omitted.
 
 Reads `dataset/FEVER/fever_10k_test.json` and saves results to `evaluation/FEVER/results/ours_5_vanilla_open_llama_3b.json`.
 
@@ -181,6 +184,24 @@ After the initial ParaRel reproduction (see below), the results did not align wi
 | **FPR (Type I)** | 0.9848 | 0.9796 |
 
 > **Note**: The high FPR (~0.98) indicates the threshold is too restrictive with `num_try=5`, classifying only ~1% of samples as certain. The paper uses `num_try=15` and reports ~60–67% certain accuracy on ParaRel ID with OpenLLaMA-3B.
+
+### FEVER — Vanilla Entropy (VE5)
+
+**Configuration:** VE5 (Vanilla Entropy, `num_try=5`), α = 0.05, δ = 0.01, τ = -0.6730, Model: OpenLLaMA-3B
+
+| Metric | Our Reproduction | Paper (VE5) |
+|---|---|---|
+| **Total samples** | 9,999 | 10,000 |
+| **Total accuracy** | 32.47% | — |
+| **Pretrained AP** | 0.3825 | 0.3974 |
+| **Certain samples** | 8,122 (81.2%) | — |
+| **Certain accuracy** | 32.79% | 60.24% |
+| **Uncertain samples** | 1,877 | — |
+| **Uncertain accuracy** | 31.11% | — |
+| **FNR (Type II)** | 0.8085 | — |
+| **FPR (Type I)** | 0.1799 | 0.0164 |
+
+> **Note**: The FPR (0.18) is much better than ParaRel (~0.98), indicating the threshold is less restrictive. However, the certain accuracy (32.79%) is far below the paper's reported 60.24%, and the FNR (0.81) is very high — meaning the model rejects most correct answers as uncertain. The pretrained AP (0.38) is close to the paper's (0.40), confirming the base model performance is similar.
 
 ---
 

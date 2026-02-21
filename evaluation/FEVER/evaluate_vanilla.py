@@ -38,36 +38,18 @@ def format_question(input_data):
 
 def inference(input_text):
     full_input = format_question(input_text)
-    messages = [
-        {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
-        {"role": "user", "content": full_input}
-    ]
-    text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True
-    )
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    ids = model_inputs.input_ids
-    #inputs = tokenizer(full_input,return_tensors="pt",padding=False).to(device)
-    #ids = inputs['input_ids']
+    inputs = tokenizer(full_input,return_tensors="pt",padding=False).to(device)
+    ids = inputs['input_ids']
     attention_mask = torch.ones_like(ids)
     length = len(ids[0])     
     outputs = model.generate(
-                **model_inputs,
+                ids,
                 max_new_tokens = 1,
                 output_scores = True,
                 return_dict_in_generate=True,
                 pad_token_id=tokenizer.eos_token_id,
+                attention_mask=attention_mask
             )
-    # outputs = model.generate(
-    #             ids,
-    #             max_new_tokens = 1,
-    #             output_scores = True,
-    #             return_dict_in_generate=True,
-    #             pad_token_id=tokenizer.eos_token_id,
-    #             attention_mask=attention_mask
-    #         )
     # print(outputs['scores'][0][0, 1065:1068])
     logits_for_choice = outputs['scores'][0][0]    #The first token
     #print(tokenizer.decode(outputs['sequences'][0], skip_special_tokens=True))
