@@ -132,6 +132,16 @@ python eval.py \
 
 ## Reproduction Results
 
+### Why FEVER?
+
+After the initial ParaRel reproduction (see below), the results did not align with the paper. To further validate the framework, we chose to reproduce on the **FEVER** dataset for the following reasons:
+
+- **Multiple-choice format** (3 options: SUPPORTED, REFUTED, NOT ENOUGH INFO) — simple to run, same as WiCE
+- **Large dataset** (10k samples) — provides more stable and reproducible estimates compared to WiCE's small test set
+- **Clear accuracy improvement** in the paper: Pretrained 39.74% → VE5 60.24% → VE15 62.50%, a solid ~20pp gain
+- **Well-controlled Type I error** in the paper (0.0164 for VE5 with OpenLLaMA-3B)
+- **WiCE was considered** due to its high pretrained baseline (64.72%), but its small test set leads to noisy estimates and wide confidence intervals, making it harder to confirm reproduction
+
 ### ParaRel — Vanilla Entropy (VE5)
 
 **Configuration:** VE5 (Vanilla Entropy, `num_try=5`), α = 0.05, δ = 0.01, τ = -1.6094, Model: OpenLLaMA-3B
