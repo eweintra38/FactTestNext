@@ -94,6 +94,25 @@
 | **FPR (Type I)** | 0.9848 | 0.0455 | 0.9796 | — (Fig. 4 only) |
 
 
+### ParaRel — Semantic Entropy (SE5)
+
+**Configuration:** SE5 (Semantic Entropy, `num_try=5`), α = 0.05, δ = 0.01, τ = -5.7775, Model: OpenLLaMA-3B
+
+| Metric | Our ID | Paper ID (SE5) |
+|---|---|---|
+| **Total samples** | 5,584 | — |
+| **Pretrained accuracy** | 20.00% | 36.66% |
+| **Pretrained AP** | 0.2728 | — |
+| **Certain samples** | 362 | — |
+| **Certain accuracy** | **33.70%** | **60.10%** |
+| **Certain 95% CI** | (29.01%, 38.67%) | — |
+| **Uncertain samples** | 5,222 | — |
+| **Uncertain accuracy** | 19.05% | — |
+| **FNR (Type II)** | 0.0537 | — |
+| **FPR (Type I)** | 0.8908 | — |
+
+> **Note**: Compared to VE5 (τ = -1.6094, 63 certain samples), SE5 uses a much lower threshold (τ = -5.7775) and classifies significantly more samples as certain (362 vs 63). The certain accuracy improves from 26.98% (VE5) to 33.70% (SE5), and the FPR drops from 0.9848 to 0.8908. However, the certain accuracy remains far below the paper's reported 60.10%.
+
 
 ### FEVER — Vanilla Entropy (VE5)
 
