@@ -157,17 +157,19 @@ if __name__ == "__main__":
 
     device = accelerator.device
     tokenizer = AutoTokenizer.from_pretrained(args.model, use_fast=True, unk_token="<unk>", bos_token="<s>", eos_token="</s>", add_bos_token=False, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(args.model, device_map=device, torch_dtype=torch.float16, trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(args.model, device_map=device, torch_dtype=torch.float16, trust_remote_code=True, use_safetensors=True)
 
     deberta_tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v2-xlarge-mnli")
-    deberta_model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v2-xlarge-mnli").cuda()
+    deberta_model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v2-xlarge-mnli", use_safetensors=True).cuda()
     
     if tokenizer.pad_token is None:
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
-    period_token_id = tokenizer('. ')['input_ids'][1]
-    eos_tokens = ['Question:', ' Question:', '\n', 'Answer:', ' Answer:', 'Q:']
-    question_framing_ids = [[tokenizer(eos_token)['input_ids'][1]] for eos_token in eos_tokens]
+    # period_token_id and question_framing_ids are not used in the main loop
+    # Commented out to avoid tokenizer index errors with certain models
+    # period_token_id = tokenizer('. ')['input_ids'][-1]
+    # eos_tokens = ['Question:', ' Question:', '\n', 'Answer:', ' Answer:', 'Q:']
+    # question_framing_ids = [[tokenizer(eos_token)['input_ids'][-1]] for eos_token in eos_tokens]
 
     STOP.append(tokenizer(".").input_ids)
     SURE.append(tokenizer("sure").input_ids)
